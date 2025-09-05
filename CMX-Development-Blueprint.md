@@ -82,6 +82,8 @@ cmx-frontend/
 
 ## Domain Modules
 
+**IMPORTANT:** Domain modules are business-driven and will change frequently. Any updates to module features/flows should trigger code regeneration to maintain consistency.
+
 ### Dispatch Module
 - Manages claim dispatching to surveyors or repair shops
 - Handles allocation rules and priorities  
@@ -90,6 +92,7 @@ cmx-frontend/
 ### FNOL (First Notice of Loss) Module
 Handles the initial intake of claim cases. Functionalities include:
 
+#### Search Policy
 1. **Search Policy by Vehicle Registration Number**  
    - Allow searching existing policy records using car license plate
    - Validation: must match policy records in DB
@@ -110,10 +113,103 @@ Handles the initial intake of claim cases. Functionalities include:
    - Lookup using vehicle chassis number (VIN)
    - Ensure uniqueness and validation against DB
 
+#### Display Policy
+- Show policy details after successful search
+- Display policy holder information, vehicle details, coverage information
+- Present policy status and validity dates
+
+#### Create Claim
+- Initialize new claim creation from selected policy
+- Capture incident details, date, time, and location
+- Record initial damage assessment and description
+
+#### Create SDS Number
+- Generate unique SDS (System Data Storage) reference number
+- Link SDS number to claim and policy records
+- Ensure SDS number uniqueness across the system
+
+#### Search Claim
+- Search existing claims by various criteria
+- Filter by claim number, policy number, or SDS number
+- Display claim status, progress, and associated details
+
+#### Display Claim Detail
+- Show comprehensive claim information and history
+- Present claim progress, status updates, and timeline
+- Display associated documents, photos, and communications
+
+#### Calendar for Appointment/Follow Case
+- Schedule appointments for claim follow-ups and inspections
+- Track case milestones and important dates
+- Set reminders for claim processing deadlines and reviews
+
+#### Submit Claim Information to GDP
+- Integrate with GDP (General Data Protection) system
+- Submit required claim data for regulatory compliance
+- Ensure secure transmission of sensitive information
+
+#### Display Label
+- Generate and display claim labels for documentation
+- Print labels for file organization and tracking
+- Create reference labels for physical claim documents
+
 ### Surveyor Module
 - Assign and manage surveyors for claims
 - Handle scheduling, on-site survey logging, and photo uploads
-- Track surveyor performance and workload  
+- Track surveyor performance and workload
+
+---
+
+## Domain Module Change Management
+
+### Change Detection Triggers
+When domain modules are updated, the following should trigger code regeneration:
+
+1. **Business Rule Changes** - New validation rules, modified workflows
+2. **New Features Added** - Additional search criteria, new functionality
+3. **Data Model Changes** - Entity modifications, new relationships
+4. **Integration Requirements** - New external API integrations
+5. **UI/UX Flow Updates** - Modified user workflows, new screens
+
+### Pre-Hook for Domain Changes
+Execute **before applying domain module changes**:
+
+1. **Impact Analysis**
+   ```bash
+   # Analyze which components will be affected
+   - Check existing handlers, validators, services
+   - Identify database schema changes needed
+   - Review API contract changes
+   ```
+
+2. **Code Regeneration Checklist**
+   ```bash
+   # Components to regenerate when domain changes
+   - Update validators (FluentValidation rules)
+   - Regenerate handlers (business logic changes)
+   - Update services (data access modifications)  
+   - Modify controllers (API contract changes)
+   - Update frontend components (UI flow changes)
+   - Regenerate unit tests (new scenarios)
+   ```
+
+3. **Validation Steps**
+   ```bash
+   # Ensure consistency after changes
+   - Run full test suite (90%+ coverage maintained)
+   - Validate API contracts (no breaking changes)
+   - Check database migration scripts
+   - Verify frontend-backend integration
+   ```
+
+### AI Assistant Instructions for Domain Changes
+When user requests domain module updates:
+
+1. **Always ask for clarification:** "This will affect existing code. Should I regenerate affected components?"
+2. **Show impact scope:** List all components that will be modified
+3. **Maintain compatibility:** Ensure changes don't break existing functionality
+4. **Update tests:** Regenerate all affected unit tests
+5. **Document changes:** Update any affected documentation or API specs  
 
 ---
 
@@ -251,10 +347,14 @@ Real-time: Signals + RxJS streams
 
 ### Pre-Hook
 Executed **before build/deploy**:
-1. Run static code analysis (SOLID + N-Tier compliance).  
-2. Run unit tests with Xunit (90% coverage).  
-3. Check code duplication (<10%).  
-4. Validate external dependencies.  
+1. Run static code analysis (SOLID + N-Tier compliance)
+2. Run unit tests with Xunit (90% coverage)
+3. Check code duplication (<10%)
+4. Validate external dependencies
+5. **Domain Module Consistency Check:**
+   - Verify all domain modules have corresponding components generated
+   - Check that business rules are properly implemented in validators
+   - Ensure frontend-backend API contract alignment  
 
 ### Post-Hook
 Executed **after build/deploy**:
